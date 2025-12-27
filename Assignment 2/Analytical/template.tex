@@ -1,0 +1,74 @@
+\documentclass[12pt]{article}
+
+% ---------- Page geometry ----------
+\usepackage[a4paper,margin=2.5cm]{geometry}
+
+% ---------- Graphics ----------
+\usepackage{graphicx}
+
+% ---------- Header/Footer (page numbers) ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{} % clear all header/footer fields
+\fancyfoot[C]{\thepage} % page number centered in footer
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% ---------- Border line on every page ----------
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+
+% Distance of the border from page edges:
+\newcommand{\BorderInset}{1.0cm}
+\newcommand{\BorderLineWidth}{0.8pt}
+
+\AddToShipoutPictureBG{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \draw[line width=\BorderLineWidth]
+      ($(current page.north west)+(\BorderInset,-\BorderInset)$)
+      rectangle
+      ($(current page.south east)+(-\BorderInset,\BorderInset)$);
+  \end{tikzpicture}%
+}
+
+% ---------- Editable fields (set these once) ----------
+\newcommand{\CourseName}{Course Name}
+\newcommand{\StudentName}{Mobin Nesari}
+\newcommand{\StudentID}{403422231}
+\newcommand{\AssignmentTitle}{Assignment Name}
+
+\begin{document}
+
+% ---------- Title page ----------
+\begin{titlepage}
+  \centering
+  \vspace*{2.0cm}
+
+  % University logo (big, centered)
+  \includegraphics[width=0.65\textwidth]{logo.png}
+
+  \vspace{1.8cm}
+
+  % Course name (big font)
+  {\Huge \bfseries \CourseName \par}
+  \vspace{0.8cm}
+
+  % Assignment / homework title (smaller than course name, larger than name)
+  {\huge \itshape \AssignmentTitle \par}
+
+  \vspace{1.2cm}
+
+  % Name + ID
+  {\LARGE \StudentName \par}
+  \vspace{0.3cm}
+  {\large Student ID: \StudentID \par}
+
+  \vfill
+\end{titlepage}
+
+% ---------- Your homework content starts here ----------
+\section*{Problem 1}
+Write your solutions here...
+
+\end{document}
