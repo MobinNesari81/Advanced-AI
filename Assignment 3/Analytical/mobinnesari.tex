@@ -1,0 +1,211 @@
+\documentclass[12pt]{article}
+
+% ---------- Page geometry ----------
+\usepackage[a4paper,margin=2.5cm]{geometry}
+
+% ---------- Math packages ----------
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% ---------- Graphics ----------
+\usepackage{graphicx}
+
+% ---------- Header/Footer (page numbers) ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{} % clear all header/footer fields
+\fancyfoot[C]{\thepage} % page number centered in footer
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% ---------- Border line on every page ----------
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+
+% Distance of the border from page edges:
+\newcommand{\BorderInset}{1.0cm}
+\newcommand{\BorderLineWidth}{0.8pt}
+
+\AddToShipoutPictureBG{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \draw[line width=\BorderLineWidth]
+      ($(current page.north west)+(\BorderInset,-\BorderInset)$)
+      rectangle
+      ($(current page.south east)+(-\BorderInset,\BorderInset)$);
+  \end{tikzpicture}%
+}
+
+% ---------- Editable fields (set these once) ----------
+\newcommand{\CourseName}{Advanced AI Graduate Course}
+\newcommand{\StudentName}{Mobin Nesari}
+\newcommand{\StudentID}{403422231}
+\newcommand{\AssignmentTitle}{Assignment 3: Pacman!}
+
+\begin{document}
+
+% ---------- Title page ----------
+\begin{titlepage}
+  \centering
+  \vspace*{2.0cm}
+
+  % University logo (big, centered)
+  \includegraphics[width=0.65\textwidth]{logo.png}
+
+  \vspace{1.8cm}
+
+  % Course name (big font)
+  {\Huge \bfseries \CourseName \par}
+  \vspace{0.8cm}
+
+  % Assignment / homework title (smaller than course name, larger than name)
+  {\huge \itshape \AssignmentTitle \par}
+
+  \vspace{1.2cm}
+
+  % Name + ID
+  {\LARGE \StudentName \par}
+  \vspace{0.3cm}
+  {\large Student ID: \StudentID \par}
+
+  \vfill
+\end{titlepage}
+
+% ---------- Your homework content starts here ----------
+
+\section*{Problem 1: Minimax}
+
+\subsection*{Part (a): Minimax Recurrence [5 points]}
+
+We define the minimax value function $V_{\text{minmax}}(s,d)$ for a state $s$ at depth $d$ as follows:
+
+\[
+V_{\text{minmax}}(s,d) = 
+\begin{cases}
+\text{Utility}(s) & \text{if } \text{IsEnd}(s) \\
+\text{Eval}(s) & \text{if } d = 0 \\
+\displaystyle\max_{a \in \text{Actions}(s)} V_{\text{minmax}}(\text{Succ}(s,a), d) & \text{if } \text{Player}(s) = a_0 \\
+\displaystyle\min_{a \in \text{Actions}(s)} V_{\text{minmax}}(\text{Succ}(s,a), d) & \text{if } \text{Player}(s) = a_i, \, 1 \leq i < n \\
+\displaystyle\min_{a \in \text{Actions}(s)} V_{\text{minmax}}(\text{Succ}(s,a), d-1) & \text{if } \text{Player}(s) = a_n
+\end{cases}
+\]
+
+\textbf{Explanation:}
+\begin{itemize}
+    \item If the state is terminal ($\text{IsEnd}(s)$), return the utility
+    \item If we've reached depth 0, use the evaluation function
+    \item If it's Pacman's turn ($a_0$), maximize over actions
+    \item If it's a ghost's turn ($a_i$ where $1 \leq i < n$), minimize over actions without decrementing depth
+    \item If it's the last ghost's turn ($a_n$), minimize over actions and decrement depth (completing one full ply)
+\end{itemize}
+
+\subsection*{Part (b): Implementation [10 points]}
+The MinimaxAgent has been implemented in \texttt{submission.py}.
+
+\newpage
+\section*{Problem 2: Alpha-beta Pruning}
+
+\subsection*{Part (a): Implementation [10 points]}
+The AlphaBetaAgent has been implemented in \texttt{submission.py} with alpha-beta pruning optimization.
+
+\newpage
+\section*{Problem 3: Expectimax}
+
+\subsection*{Part (a): Expectimax Recurrence [5 points]}
+
+We define the expectimax value function $V_{\text{exptmax}}(s,d)$ for a state $s$ at depth $d$ as follows:
+
+\[
+V_{\text{exptmax}}(s,d) = 
+\begin{cases}
+\text{Utility}(s) & \text{if } \text{IsEnd}(s) \\
+\text{Eval}(s) & \text{if } d = 0 \\
+\displaystyle\max_{a \in \text{Actions}(s)} V_{\text{exptmax}}(\text{Succ}(s,a), d) & \text{if } \text{Player}(s) = a_0 \\
+\displaystyle\frac{1}{|\text{Actions}(s)|}\sum_{a \in \text{Actions}(s)} V_{\text{exptmax}}(\text{Succ}(s,a), d) & \text{if } \text{Player}(s) = a_i, \, 1 \leq i < n \\
+\displaystyle\frac{1}{|\text{Actions}(s)|}\sum_{a \in \text{Actions}(s)} V_{\text{exptmax}}(\text{Succ}(s,a), d-1) & \text{if } \text{Player}(s) = a_n
+\end{cases}
+\]
+
+\textbf{Explanation:}
+\begin{itemize}
+    \item Terminal states and depth limits are handled the same as minimax
+    \item Pacman still maximizes (takes the best action)
+    \item Ghost moves are now modeled as chance nodes: we compute the expected value by averaging over all possible actions (assuming uniform random selection)
+    \item The last ghost decrements depth after computing the expected value
+\end{itemize}
+
+\subsection*{Part (b): Implementation [10 points]}
+The ExpectimaxAgent has been implemented in \texttt{submission.py}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/expectimax_agent.png}
+    \caption{Expectimax agent gameplay demonstration}
+\end{figure}
+
+\newpage
+\section*{Problem 4: Evaluation Function (Extra Credit)}
+
+\subsection*{Part (b): Evaluation Function Description [1 point]}
+
+\textbf{High-Level Motivation:}
+
+My evaluation function combines multiple weighted heuristics to create an aggressive yet survival-conscious Pacman agent. The core strategy is to prioritize food collection while maintaining dynamic risk assessment based on ghost states.
+
+\textbf{Key Components:}
+
+\begin{enumerate}
+    \item \textbf{Base Score:} Start with the current game score as the foundation
+    \item \textbf{Food Distance:} Add $10.0/(d_{food}+1)$ where $d_{food}$ is the Manhattan distance to the nearest food pellet. This encourages Pacman to move toward food
+    \item \textbf{Ghost Evaluation:}
+    \begin{itemize}
+        \item \textit{Scared ghosts:} Add $200.0/(d_{ghost}+1)$ plus a bonus of 500 if within 1 square, encouraging aggressive ghost hunting
+        \item \textit{Active ghosts:} Subtract 1000 if distance $< 2$ (critical danger), 50 if distance $< 4$ (caution zone), or add $2 \times d_{ghost}$ for safe distances
+    \end{itemize}
+    \item \textbf{Remaining Food Penalty:} Subtract $4 \times$ number of food pellets to encourage game completion
+    \item \textbf{Capsule Penalty:} Subtract $10 \times$ number of capsules to encourage power-up usage
+\end{enumerate}
+
+\textbf{What I Tried:}
+
+\begin{itemize}
+    \item Initially tried simpler distance-only heuristics, but Pacman would suicide into ghosts
+    \item Experimented with different weight values; found that heavy penalties ($\geq 1000$) for close ghosts were essential
+    \item Tested both linear and inverse distance relationships; inverse worked better for food attraction
+    \item Added game completion urgency (food/capsule penalties) which significantly improved win rate
+\end{itemize}
+
+\textbf{What Worked:}
+The combination of inverse distance rewards for food, severe proximity penalties for active ghosts, and high rewards for scared ghosts created a well-balanced agent that wins consistently while achieving high scores.
+
+\textbf{What Didn't Work:}
+Simple linear distance metrics, equal weighting of all factors, and insufficient ghost danger penalties led to erratic behavior and frequent deaths.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/reflex_agents.png}
+    \caption{Reflex agent with improved evaluation function}
+\end{figure}
+
+\newpage
+\section*{Problem 5: AI (Mis)Alignment and Reward Hacking}
+
+\subsection*{Part (a): Behavioral Difference [2 points]}
+
+The minimax agent always rushes the closest ghost because it assumes the ghosts play optimally (minimizing Pacman's score), so it believes any path leads to certain death and chooses the path with the highest current score before dying. The expectimax agent doesn't rush the ghosts because it models them as random agents, computing expected values that show some probability of survival if ghosts move away randomly, making food collection a viable strategy.
+
+\subsection*{Part (b): Alignment Fix [1 point]}
+
+Modify $\text{Eval}(s)$ to include a heavy penalty proportional to the proximity to active ghosts, such as subtracting $1000/(d_{ghost}+1)$ where $d_{ghost}$ is the distance to the nearest active ghost. This would make states near ghosts appear much less desirable in the minimax tree, causing the agent to prefer paths that maintain distance from ghosts even under the worst-case (optimal ghost) assumption, thus avoiding the suicidal rushing behavior.
+
+\subsection*{Part (c): Real-world AI Misalignment Example [2 points]}
+
+\textbf{Example: Autonomous Delivery Drones}
+
+An autonomous delivery drone system might be designed with the objective function of minimizing delivery time. This is susceptible to \textbf{both reward hacking and negative side effects}:
+
+\textbf{Reward Hacking:} The drone might take dangerous shortcuts like flying through restricted airspace, ignoring safety protocols, or flying at unsafe speeds in populated areas—all of which technically minimize delivery time but violate the designer's true intent of safe and legal delivery.
+
+\textbf{Negative Side Effects:} Even if the drone delivers packages quickly and legally, it might cause noise pollution by flying at night, disturb wildlife by taking routes through nature reserves, or create privacy concerns by frequently hovering near residential windows—side effects that conflict with broader societal values despite achieving the stated optimization goal.
+
+\end{document}
